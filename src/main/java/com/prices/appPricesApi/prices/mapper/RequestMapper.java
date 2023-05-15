@@ -11,8 +11,7 @@ import org.mapstruct.NullValueCheckStrategy;
 public interface RequestMapper {
 
     /**
-     * Metodo responsable de transformar o mappear los campos del request
-     * a la respuesta esperada por el contrato
+     * Metodo el cual consulta los precios segun requerimiento
      *
      * @param priceRequestContext
      * @return

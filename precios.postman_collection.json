@@ -1,0 +1,40 @@
+{
+	"info": {
+		"_postman_id": "2e385118-bb2f-4a0b-975b-e91bb3dba07e",
+		"name": "precios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Consulta precios",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"appDate\": \"2020-12-31 23:59:59\",\r\n  \"productId\": 35455,\r\n  \"brandId\": 1\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/price",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"price"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
