@@ -27,3 +27,10 @@ acceso base de datos
 ejecucion proyecto
 
 ![img_8.png](img_8.png)
+
+
+
+curl --location --request GET 'http://localhost:8080/price?appDate=2023-05-26T17%3A05%3A45&productId=35455&brandId=1' \
+--header 'Content-Type: application/json'
+
+

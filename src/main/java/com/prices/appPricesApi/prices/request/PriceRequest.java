@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @Setter
 @Getter
+
 public class PriceRequest {
     private LocalDateTime appDate;
     private Integer productId;
