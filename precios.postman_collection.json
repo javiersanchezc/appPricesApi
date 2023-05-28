@@ -6,24 +6,17 @@
 	},
 	"item": [
 		{
-			"name": "Consulta precios",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
+			"name": "consulta precios",
 			"request": {
 				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"appDate\": \"2020-12-31 23:59:59\",\r\n  \"productId\": 35455,\r\n  \"brandId\": 1\r\n}\r\n\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
 					}
-				},
+				],
 				"url": {
-					"raw": "http://localhost:8080/price",
+					"raw": "http://localhost:8080/price?appDate=2023-05-26T17%3A05%3A45&productId=35455&brandId=1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -31,6 +24,20 @@
 					"port": "8080",
 					"path": [
 						"price"
+					],
+					"query": [
+						{
+							"key": "appDate",
+							"value": "2023-05-26T17%3A05%3A45"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "brandId",
+							"value": "1"
+						}
 					]
 				}
 			},

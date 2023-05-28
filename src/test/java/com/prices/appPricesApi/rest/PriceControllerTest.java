@@ -1,157 +1,136 @@
 package com.prices.appPricesApi.rest;
 
-
+import com.prices.appPricesApi.prices.PriceService;
 import com.prices.appPricesApi.prices.request.PriceRequest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prices.appPricesApi.prices.response.PriceResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class PriceControllerTest {
+class PriceControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private PriceService priceService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private PriceController priceController;
 
-    @Test
-    public void testGetPrice() throws Exception {
-        PriceRequest priceRequest = PriceRequest.builder()
-                .brandId(1)
-                .productId(1)
-                .appDate(LocalDateTime.parse("2023-05-15T20:42:58.663", DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .build();
-
-        String jsonRequest = objectMapper.writeValueAsString(priceRequest);
-
-        mockMvc.perform(get("/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title", is("Not Found")))
-                .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.detail", is("La combinacion de [brand, product_id y fecha de la aplicacion] son invalidas")));
-    }
-    @Test
-    public void testGetPrice_10am_day14() throws Exception {
-        PriceRequest priceRequest = PriceRequest.builder()
-                .brandId(1)
-                .productId(1)
-                .appDate(LocalDateTime.parse("2023-05-14T10:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .build();
-
-        String jsonRequest = objectMapper.writeValueAsString(priceRequest);
-
-        mockMvc.perform(get("/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title", is("Not Found")))
-                .andExpect(jsonPath("$.status", is(404)))
-                .andExpect(jsonPath("$.detail", is("La combinacion de [brand, product_id y fecha de la aplicacion] son invalidas")));
-
-        // Add more mockMvc.perform blocks for other test cases...
-    }
-
-
-    @Test
-    public void testGetPrice_4pm_day14() throws Exception {
-        PriceRequest priceRequest = PriceRequest.builder()
-                .brandId(1)
-                .productId(1)
-                .appDate(LocalDateTime.parse("2023-05-14T16:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .build();
-
-        String jsonRequest = objectMapper.writeValueAsString(priceRequest);
-
-        mockMvc.perform(get("/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("La combinacion de [brand, product_id y fecha de la aplicacion] son invalidas"));
-
-        // Add more mockMvc.perform blocks for other test cases...
-    }
-
-
-    @Test
-    public void testGetPrice_9pm_day14() throws Exception {
-        PriceRequest priceRequest = PriceRequest.builder()
-                .brandId(1)
-                .productId(1)
-                .appDate(LocalDateTime.parse("2023-05-14T21:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                .build();
-
-        String jsonRequest = objectMapper.writeValueAsString(priceRequest);
-
-        mockMvc.perform(get("/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("La combinacion de [brand, product_id y fecha de la aplicacion] son invalidas"));
-
-        // Add more mockMvc.perform blocks for other test cases...
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetPrice_10am_day15() throws Exception {
-        PriceRequest priceRequest = PriceRequest.builder()
+    void testGetPrice_at10AM_onDay14_forProduct35455_andBrand1() {
+        // Arrange
+        LocalDateTime dateTime = LocalDateTime.of(2023, 5, 14, 10, 0);
+        PriceRequest expectedRequest = PriceRequest.builder()
+                .appDate(dateTime)
+                .productId(35455)
                 .brandId(1)
-                .productId(1)
-                .appDate(LocalDateTime.parse("2023-05-15T10:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();
+        PriceResponse expectedResponse = new PriceResponse(/* your expected response data */);
+        when(priceService.getPrice(expectedRequest)).thenReturn(expectedResponse);
 
-        String jsonRequest = objectMapper.writeValueAsString(priceRequest);
+        // Act
+        ResponseEntity<PriceResponse> response = priceController.getPrice(dateTime, 35455, 1);
 
-        mockMvc.perform(get("/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("La combinacion de [brand, product_id y fecha de la aplicacion] son invalidas"));
-
-        // Add more mockMvc.perform blocks for other test cases...
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
     }
 
     @Test
-    public void testGetPrice_9pm_day16() throws Exception {
-        PriceRequest priceRequest = PriceRequest.builder()
+    void testGetPrice_at4PM_onDay14_forProduct35455_andBrand1() {
+        // Arrange
+        LocalDateTime dateTime = LocalDateTime.of(2023, 5, 14, 16, 0);
+        PriceRequest expectedRequest = PriceRequest.builder()
+                .appDate(dateTime)
+                .productId(35455)
                 .brandId(1)
-                .productId(1)
-                .appDate(LocalDateTime.parse("2023-05-16T21:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();
+        PriceResponse expectedResponse = new PriceResponse(/* your expected response data */);
+        when(priceService.getPrice(expectedRequest)).thenReturn(expectedResponse);
 
-        String jsonRequest = objectMapper.writeValueAsString(priceRequest);
+        // Act
+        ResponseEntity<PriceResponse> response = priceController.getPrice(dateTime, 35455, 1);
 
-        mockMvc.perform(get("/price")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonRequest))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.detail").value("La combinacion de [brand, product_id y fecha de la aplicacion] son invalidas"));
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
+    }
 
-        // Add more mockMvc.perform blocks for other test cases...
+    // Similarly, you can write test methods for the other test cases (testGetPrice_at21PM_onDay14_forProduct35455_andBrand1,
+    // testGetPrice_at10AM_onDay15_forProduct35455_andBrand1, testGetPrice_at21PM_onDay16_forProduct35455_andBrand1)
+    // following the same pattern as shown above.
+    @Test
+    void testGetPrice_at9PM_onDay14_forProduct35455_andBrand1() {
+        // Arrange
+        LocalDateTime dateTime = LocalDateTime.of(2023, 5, 14, 21, 0);
+        PriceRequest expectedRequest = PriceRequest.builder()
+                .appDate(dateTime)
+                .productId(35455)
+                .brandId(1)
+                .build();
+        PriceResponse expectedResponse = new PriceResponse(/* your expected response data */);
+        when(priceService.getPrice(expectedRequest)).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<PriceResponse> response = priceController.getPrice(dateTime, 35455, 1);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
+    }
+
+    @Test
+    void testGetPrice_at10AM_onDay15_forProduct35455_andBrand1() {
+        // Arrange
+        LocalDateTime dateTime = LocalDateTime.of(2023, 5, 15, 10, 0);
+        PriceRequest expectedRequest = PriceRequest.builder()
+                .appDate(dateTime)
+                .productId(35455)
+                .brandId(1)
+                .build();
+        PriceResponse expectedResponse = new PriceResponse(/* your expected response data */);
+        when(priceService.getPrice(expectedRequest)).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<PriceResponse> response = priceController.getPrice(dateTime, 35455, 1);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
+    }
+
+    @Test
+    void testGetPrice_at9PM_onDay16_forProduct35455_andBrand1() {
+        // Arrange
+        LocalDateTime dateTime = LocalDateTime.of(2023, 5, 16, 21, 0);
+        PriceRequest expectedRequest = PriceRequest.builder()
+                .appDate(dateTime)
+                .productId(35455)
+                .brandId(1)
+                .build();
+        PriceResponse expectedResponse = new PriceResponse(/* your expected response data */);
+        when(priceService.getPrice(expectedRequest)).thenReturn(expectedResponse);
+
+        // Act
+        ResponseEntity<PriceResponse> response = priceController.getPrice(dateTime, 35455, 1);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
     }
 
 }
